@@ -79,7 +79,7 @@ output "iam_role_arn" {
 output "result" {
   value = {
     values = {
-      model_id = model_id
+      model = var.model_id
       region   = var.aws_region
     }
   }
