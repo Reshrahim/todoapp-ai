@@ -22,36 +22,59 @@ variable "model_id" {
   type        = string
   default = "anthropic.claude-3-sonnet-20240229-v1:0"
 }
-variable "iam_user_name" {
-  description = "IAM user name to attach Bedrock model permissions to"
-  type        = string
-  default = "reshmarahim.abdul"
-}
-
 
 locals {
   model_arn = "arn:aws:bedrock:${var.aws_region}::foundation-model/${var.model_id}"
 }
 
-resource "aws_iam_user_policy" "bedrock_access" {
-  name = "AllowBedrockModelInvoke"
-  user = var.iam_user_name
+resource "aws_iam_role" "bedrock_runtime_role" {
+  name = "BedrockRuntimeAccessRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_policy" "bedrock_model_policy" {
+  name        = "BedrockModelAccessPolicy"
+  description = "Grants access to the specified Bedrock model"
 
   policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow",
+        Effect = "Allow"
         Action = [
           "bedrock:InvokeModel",
           "bedrock:InvokeModelWithResponseStream"
-        ],
+        ]
         Resource = local.model_arn
       }
     ]
   })
 }
 
+resource "aws_iam_role_policy_attachment" "attach_model_policy" {
+  role       = aws_iam_role.bedrock_runtime_role.name
+  policy_arn = aws_iam_policy.bedrock_model_policy.arn
+}
+
+output "bedrock_model_arn" {
+  description = "The fully constructed ARN for the specified Bedrock model"
+  value       = local.model_arn
+}
+
+output "iam_role_arn" {
+  description = "IAM Role ARN with permissions to invoke the Bedrock model"
+  value       = aws_iam_role.bedrock_runtime_role.arn
+}
 
 output "result" {
   value = {
