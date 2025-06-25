@@ -83,5 +83,4 @@ output "result" {
       region   = var.aws_region
     }
   }
-  sensitive = true
 }
