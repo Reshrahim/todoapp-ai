@@ -1,0 +1,37 @@
+name: Radius.Resources
+types:
+  AI:
+    capabilities: ["SupportsRecipes"]
+    apiVersions:
+      '2023-10-01-preview':
+        schema: 
+          type: 'object'
+          properties: 
+            environment:
+              type: string
+              description: "Required: The Radius environment; typically set by the rad CLI"
+            application:
+              type: string
+              description: "Optional: The application which the resource is associated with"
+            apiKey: 
+              type: string
+              description: "Read-only: The key that can be used to connect to the API."
+              readOnly: true
+            apiVersion:
+              type: string
+              description: "Read-only: The version of the OpenAI API."
+              readOnly: true
+            model:
+              type: string
+              description: "Read-only: The model name, used by the OpenAI SDK to connect to the API."
+              readOnly: true
+            endpoint:
+              type: string
+              description: "Read-only: The endpoint URL of the OpenAI API."
+              readOnly: true
+            region:
+              type: string
+              description: "Read-only: The region where model is deployed"
+              readOnly: true
+          required:
+              - environment 
