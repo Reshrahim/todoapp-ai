@@ -28,7 +28,7 @@ locals {
 }
 
 resource "aws_iam_role" "bedrock_runtime_role" {
-  name = "BedrockRuntimeAccessRole123"
+  name = "BedrockRuntimeAccessRole12"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -43,7 +43,7 @@ resource "aws_iam_role" "bedrock_runtime_role" {
 }
 
 resource "aws_iam_policy" "bedrock_model_policy" {
-  name        = "BedrockModelAccessPolicy"
+  name        = "BedrockModelAccessPolicy12"
   description = "Grants access to the specified Bedrock model"
 
   policy = jsonencode({
