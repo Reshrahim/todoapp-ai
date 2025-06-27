@@ -12,7 +12,7 @@ terraform {
 }
 
 provider "aws" {
-  region = var.aws_region
+  region = var.context.aws.region
   assume_role_with_web_identity {
     role_arn = "arn:aws:iam::817312594854:role/re-irsa"
     web_identity_token_file = "/var/run/secrets/eks.amazonaws.com/serviceaccount/token"
