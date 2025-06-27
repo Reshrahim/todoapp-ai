@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 5.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.0"
+    }
   }
 }
 
@@ -12,68 +16,60 @@ provider "aws" {
 }
 
 variable "aws_region" {
-  description = "AWS Region for deploying resources"
+  description = "AWS Region"
   type        = string
   default     = "us-west-2"
 }
 
 variable "model_id" {
-  description = "The Bedrock foundation model ID (e.g., 'anthropic.claude-3-sonnet-20240229-v1:0')"
+  description = "Bedrock foundation model ID"
   type        = string
-  default = "anthropic.claude-3-sonnet-20240229-v1:0"
+  default     = "anthropic.claude-3-sonnet-20240229-v1:0"
+}
+
+# Ensure uniqueness
+resource "random_id" "suffix" {
+  byte_length = 4
 }
 
 locals {
-  model_arn = "arn:aws:bedrock:${var.aws_region}::foundation-model/${var.model_id}"
+  model_arn   = "arn:aws:bedrock:${var.aws_region}::foundation-model/${var.model_id}"
+  user_name   = "bedrock-user-${random_id.suffix.hex}"
+  policy_name = "BedrockUserPolicy-${random_id.suffix.hex}"
 }
 
-resource "aws_iam_role" "bedrock_runtime_role" {
-  name = "BedrockRuntimeAccessRole12"
+# IAM user
+resource "aws_iam_user" "bedrock_user" {
+  name = local.user_name
+}
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
+# Policy to allow Bedrock model access
+resource "aws_iam_policy" "bedrock_policy" {
+  name        = local.policy_name
+  description = "Policy to allow Bedrock model invocation"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
     Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Service = "lambda.amazonaws.com"
-      }
-      Action = "sts:AssumeRole"
+      Effect   = "Allow",
+      Action   = [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+      ],
+      Resource = local.model_arn
     }]
   })
 }
 
-resource "aws_iam_policy" "bedrock_model_policy" {
-  name        = "BedrockModelAccessPolicy12"
-  description = "Grants access to the specified Bedrock model"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "bedrock:InvokeModel",
-          "bedrock:InvokeModelWithResponseStream"
-        ]
-        Resource = local.model_arn
-      }
-    ]
-  })
+# Attach policy to user
+resource "aws_iam_user_policy_attachment" "attach_policy" {
+  user       = aws_iam_user.bedrock_user.name
+  policy_arn = aws_iam_policy.bedrock_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "attach_model_policy" {
-  role       = aws_iam_role.bedrock_runtime_role.name
-  policy_arn = aws_iam_policy.bedrock_model_policy.arn
-}
-
-output "bedrock_model_arn" {
-  description = "The fully constructed ARN for the specified Bedrock model"
-  value       = local.model_arn
-}
-
-output "iam_role_arn" {
-  description = "IAM Role ARN with permissions to invoke the Bedrock model"
-  value       = aws_iam_role.bedrock_runtime_role.arn
+# Create access keys for the user
+resource "aws_iam_access_key" "bedrock_user_key" {
+  user = aws_iam_user.bedrock_user.name
 }
 
 output "result" {
@@ -81,6 +77,8 @@ output "result" {
     values = {
       model = var.model_id
       region   = var.aws_region
+      access_key_id     = aws_iam_access_key.bedrock_user_key.id
+      secret_access_key = aws_iam_access_key.bedrock_user_key.secret
     }
   }
 }
