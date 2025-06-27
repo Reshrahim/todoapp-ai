@@ -1,6 +1,6 @@
 name: Radius.Resources
 types:
-  AI:
+  feedbackAI:
     capabilities: ["SupportsRecipes"]
     apiVersions:
       '2023-10-01-preview':
