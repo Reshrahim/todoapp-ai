@@ -23,12 +23,6 @@ provider "aws" {
   }
 }
 
-variable "aws_region" {
-  description = "AWS Region"
-  type        = string
-  default     = "us-west-2"
-}
-
 variable "model_id" {
   description = "Bedrock foundation model ID"
   type        = string
@@ -84,7 +78,7 @@ output "result" {
   value = {
     values = {
       model = var.model_id
-      region   = var.aws_region
+      region   = "us-west-2"
       access_key_id     = aws_iam_access_key.bedrock_user_key.id
       secret_access_key = aws_iam_access_key.bedrock_user_key.secret
     }
