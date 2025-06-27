@@ -15,7 +15,7 @@ variable "context" {
 variable "bucket" {
   description = "The name of your S3 bucket. Must follow AWS S3 naming conventions."
   type        = string
-  default     = "mys3bucket1"
+  default     = "mys3bucketreaabdul"
 }
 
 resource "aws_s3_bucket" "bucket" {
