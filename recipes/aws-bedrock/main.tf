@@ -15,14 +15,8 @@ variable "context" {
   type = any
 }
 
-variable "aws_region" {
-  description = "AWS region to use"
-  type        = string
-  default     = "us-west-2"
-}
-
 provider "aws" {
-  region = "u"
+  region = "us-west-2"
   assume_role_with_web_identity {
     role_arn = "arn:aws:iam::817312594854:role/re-irsa"
     web_identity_token_file = "/var/run/secrets/eks.amazonaws.com/serviceaccount/token"
