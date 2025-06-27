@@ -22,7 +22,7 @@ variable "aws_region" {
 }
 
 provider "aws" {
-  region = "us-west-2"
+  region = "u"
   assume_role_with_web_identity {
     role_arn = "arn:aws:iam::817312594854:role/re-irsa"
     web_identity_token_file = "/var/run/secrets/eks.amazonaws.com/serviceaccount/token"
@@ -83,16 +83,14 @@ resource "aws_iam_access_key" "bedrock_user_key" {
 output "result" {
   value = {
     values = {
-      model             = var.model_id
-      region            = var.aws_region
+      model = var.model_id
+      region   = "us-west-2"
       access_key_id     = aws_iam_access_key.bedrock_user_key.id
       secret_access_key = aws_iam_access_key.bedrock_user_key.secret
     }
     resources = [
-      format("/planes/aws/aws/accounts/817312594854/regions/%s/providers/AWS.iam/policy/%s", var.aws_region, aws_iam_policy.bedrock_policy.name),
-      format("/planes/aws/aws/accounts/817312594854/regions/%s/providers/AWS.iam/user/%s", var.aws_region, aws_iam_user.bedrock_user.name)
+        "/planes/aws/aws/accounts/817312594854/regions/us-west-2/providers/AWS.iam/policy/${aws_iam_policy.bedrock_policy.name}",
+        "/planes/aws/aws/accounts/817312594854/regions/us-west-2/providers/AWS.iam/user/${aws_iam_user.bedrock_user.name}"
     ]
   }
-
-  sensitive = true
 }
