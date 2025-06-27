@@ -13,6 +13,9 @@ terraform {
 
 provider "aws" {
   region = var.aws_region
+  assume_role {
+    role_arn = "arn:aws:iam::817312594854:role/re-irsa"
+  }
 }
 
 variable "aws_region" {
