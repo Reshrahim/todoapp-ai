@@ -35,7 +35,7 @@ resource "random_id" "suffix" {
 }
 
 locals {
-  model_arn   = "arn:aws:bedrock:${var.aws_region}::foundation-model/${var.model_id}"
+  model_arn   = "arn:aws:bedrock:us-west-2::foundation-model/${var.model_id}"
   user_name   = "bedrock-user-${random_id.suffix.hex}"
   policy_name = "BedrockUserPolicy-${random_id.suffix.hex}"
 }
@@ -81,6 +81,10 @@ output "result" {
       region   = "us-west-2"
       access_key_id     = aws_iam_access_key.bedrock_user_key.id
       secret_access_key = aws_iam_access_key.bedrock_user_key.secret
+    }
+    resources = {
+        "planes/aws/aws/accounts/817312594854/regions/us-west-2/providers/AWS.iam/policy/${aws_iam_policy.bedrock_policy.name}",
+
     }
   }
 }
