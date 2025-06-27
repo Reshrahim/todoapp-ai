@@ -83,8 +83,8 @@ output "result" {
       secret_access_key = aws_iam_access_key.bedrock_user_key.secret
     }
     resources = [
-        "planes/aws/aws/accounts/817312594854/regions/us-west-2/providers/AWS.iam/policy/${aws_iam_policy.bedrock_policy.name}",
-        "planes/aws/aws/accounts/817312594854/regions/us-west-2/providers/AWS.iam/user/${aws_iam_user.bedrock_user.name}"
+        "/planes/aws/aws/accounts/817312594854/regions/us-west-2/providers/AWS.iam/policy/${aws_iam_policy.bedrock_policy.name}",
+        "/planes/aws/aws/accounts/817312594854/regions/us-west-2/providers/AWS.iam/user/${aws_iam_user.bedrock_user.name}"
     ]
   }
 }
