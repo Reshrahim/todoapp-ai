@@ -5,6 +5,7 @@
     "extensions": {
             "radius": "br:biceptypes.azurecr.io/radius:latest",
             "aws": "br:biceptypes.azurecr.io/aws:latest",
-            "radiusResources": "radiusResources.tgz"
+            "radiusResources": "radiusResources.tgz",
+            "radiusResources1": "radiusResources1.tgz"
     }
 }
