@@ -7,11 +7,6 @@ terraform {
   }
 }
 
-provider "kubernetes" {
-  config_path    = "~/.kube/config"
-  config_context = "k3d-llama-cluster"
-}
-
 resource "kubernetes_namespace" "llama" {
   metadata {
     name = "llama"
