@@ -68,8 +68,8 @@ resource "kubernetes_deployment" "llama" {
             container_port = 8080
           }
 
-          command = ["./server"]
-          args    = ["--model", "/models/${var.model_file_name}"]
+          command = ["/app/server"]
+          args    = ["--model", "/models/${var.model_file_name}", "--host", "0.0.0.0", "--port", "8080"]
 
           volume_mount {
             mount_path = "/models"
@@ -77,16 +77,44 @@ resource "kubernetes_deployment" "llama" {
           }
 
           resources {
+            requests = {
+              memory = "2Gi"
+              cpu    = "500m"
+            }
             limits = {
               memory = "4Gi"
               cpu    = "2000m"
             }
           }
+
+          liveness_probe {
+            http_get {
+              path = "/health"
+              port = 8080
+            }
+            initial_delay_seconds = 120
+            period_seconds = 30
+            timeout_seconds = 10
+            failure_threshold = 3
+          }
+
+          readiness_probe {
+            http_get {
+              path = "/health"
+              port = 8080
+            }
+            initial_delay_seconds = 60
+            period_seconds = 10
+            timeout_seconds = 5
+            failure_threshold = 3
+          }
         }
 
         volume {
           name = "model-volume"
-          empty_dir {}
+          empty_dir {
+            size_limit = "10Gi"
+          }
         }
       }
     }
@@ -106,7 +134,7 @@ resource "kubernetes_service" "llama" {
 
     port {
       port        = 80
-      target_port = 8000
+      target_port = 8080
     }
 
     type = "ClusterIP"
