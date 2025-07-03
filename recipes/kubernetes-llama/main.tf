@@ -7,16 +7,15 @@ terraform {
   }
 }
 
-resource "kubernetes_namespace" "llama" {
-  metadata {
-    name = "llama"
-  }
+variable "context" {
+  description = "This variable contains Radius recipe context."
+  type = any
 }
 
 resource "kubernetes_deployment" "llama" {
   metadata {
     name      = "llama"
-    namespace = kubernetes_namespace.llama.metadata[0].name
+    namespace = var.context.runtime.kubernetes.namespace
     labels = {
       app = "llama"
     }
@@ -41,7 +40,7 @@ resource "kubernetes_deployment" "llama" {
       spec {
         container {
           name  = "llama"
-          image = "ghcr.io/ggerganov/llama.cpp:latest"
+          image = "ghcr.io/abetlen/llama-cpp-python:latest"
 
           port {
             container_port = 8080
@@ -79,7 +78,7 @@ resource "kubernetes_deployment" "llama" {
 resource "kubernetes_service" "llama" {
   metadata {
     name      = "llama-service"
-    namespace = kubernetes_namespace.llama.metadata[0].name
+    namespace = var.context.runtime.kubernetes.namespace
   }
 
   spec {
