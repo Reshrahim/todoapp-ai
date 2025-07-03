@@ -13,11 +13,11 @@ variable "context" {
 }
 
 variable "model_url" {
-  default = "https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.gguf"
+  default = "https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.q4_k_m.gguf"
 }
 
 variable "model_file_name" {
-  default = "llama-2-7b-chat.gguf"
+  default = "tinyllama-1.1b-chat-v1.0.q4_k_m.gguf"
 }
 
 resource "kubernetes_deployment" "llama" {
@@ -51,7 +51,7 @@ resource "kubernetes_deployment" "llama" {
           image = "curlimages/curl:latest"
           command = ["sh", "-c"]
           args = [
-            "curl -L ${var.model_url} -o /models/${var.model_file_name}"
+            "curl -L --fail --show-error --progress-bar ${var.model_url} -o /models/${var.model_file_name} && ls -la /models/"
           ]
 
           volume_mount {
@@ -78,12 +78,12 @@ resource "kubernetes_deployment" "llama" {
 
           resources {
             requests = {
-              memory = "2Gi"
-              cpu    = "500m"
+              memory = "1Gi"
+              cpu    = "250m"
             }
             limits = {
-              memory = "4Gi"
-              cpu    = "2000m"
+              memory = "2Gi"
+              cpu    = "1000m"
             }
           }
 
