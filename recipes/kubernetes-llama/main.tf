@@ -68,7 +68,7 @@ resource "kubernetes_deployment" "llama" {
             container_port = 8080
           }
 
-          command = ["/app/server"]
+          command = ["./server"]
           args    = ["--model", "/models/${var.model_file_name}", "--host", "0.0.0.0", "--port", "8080"]
 
           volume_mount {
