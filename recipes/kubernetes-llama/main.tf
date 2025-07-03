@@ -13,39 +13,6 @@ resource "kubernetes_namespace" "llama" {
   }
 }
 
-resource "kubernetes_persistent_volume" "llama_model" {
-  metadata {
-    name = "llama-model-pv"
-  }
-  spec {
-    capacity = {
-      storage = "1Gi"
-    }
-    access_modes = ["ReadOnlyMany"]
-    persistent_volume_source {
-      host_path {
-        path = "/Users/YOUR_USERNAME/models" # <-- update this to your local path
-      }
-    }
-  }
-}
-
-resource "kubernetes_persistent_volume_claim" "llama_model" {
-  metadata {
-    name      = "llama-model-pvc"
-    namespace = kubernetes_namespace.llama.metadata[0].name
-  }
-  spec {
-    access_modes = ["ReadOnlyMany"]
-    resources {
-      requests = {
-        storage = "1Gi"
-      }
-    }
-    volume_name = kubernetes_persistent_volume.llama_model.metadata[0].name
-  }
-}
-
 resource "kubernetes_deployment" "llama" {
   metadata {
     name      = "llama"
@@ -57,6 +24,7 @@ resource "kubernetes_deployment" "llama" {
 
   spec {
     replicas = 1
+
     selector {
       match_labels = {
         app = "llama"
@@ -74,30 +42,33 @@ resource "kubernetes_deployment" "llama" {
         container {
           name  = "llama"
           image = "ghcr.io/ggerganov/llama.cpp:latest"
-          command = ["bash", "-c"]
-          args = ["./server -m /models/llama-2-7b-chat.gguf -c 2048 --port 8080"]
 
           port {
             container_port = 8080
           }
 
-          volume_mount {
-            mount_path = "/models"
-            name       = "llama-model"
-          }
-
           resources {
             limits = {
-              memory = "4Gi"
-              cpu    = "2000m"
+              memory = "2Gi"
+              cpu    = "1000m"
             }
+          }
+
+          command = ["bash", "-c"]
+          args = ["./main -m /models/llama-2-7b-chat.gguf -p 'Hello from Terraform!'"]
+
+          volume_mount {
+            mount_path = "/models"
+            name       = "model-volume"
           }
         }
 
         volume {
-          name = "llama-model"
-          persistent_volume_claim {
-            claim_name = kubernetes_persistent_volume_claim.llama_model.metadata[0].name
+          name = "model-volume"
+
+          host_path {
+            path = "/path/on/host/to/model"
+            type = "Directory"
           }
         }
       }
@@ -121,9 +92,10 @@ resource "kubernetes_service" "llama" {
       target_port = 8080
     }
 
-    type = "LoadBalancer"
+    type = "ClusterIP"
   }
 }
+
 
 output "result" {
   value = {
