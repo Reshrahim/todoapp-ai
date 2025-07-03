@@ -12,6 +12,14 @@ variable "context" {
   type = any
 }
 
+variable "model_url" {
+  default = "https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.gguf"
+}
+
+variable "model_file_name" {
+  default = "llama-2-7b-chat.gguf"
+}
+
 resource "kubernetes_deployment" "llama" {
   metadata {
     name      = "llama"
@@ -41,12 +49,9 @@ resource "kubernetes_deployment" "llama" {
         init_container {
           name  = "download-model"
           image = "curlimages/curl:latest"
-          command = [
-            "sh", "-c",
-            <<-EOT
-              mkdir -p /models && \
-              curl -L -o /models/llama-2-7b-chat.gguf https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.gguf
-            EOT
+          command = ["sh", "-c"]
+          args = [
+            "curl -L ${var.model_url} -o /models/${var.model_file_name}"
           ]
 
           volume_mount {
@@ -57,10 +62,18 @@ resource "kubernetes_deployment" "llama" {
 
         container {
           name  = "llama"
-          image = "ghcr.io/abetlen/llama-cpp-python:latest"
+          image = "ghcr.io/ggerganov/llama.cpp:server"
 
           port {
-            container_port = 8000
+            container_port = 8080
+          }
+
+          command = ["./server"]
+          args    = ["--model", "/models/${var.model_file_name}"]
+
+          volume_mount {
+            mount_path = "/models"
+            name       = "model-volume"
           }
 
           resources {
@@ -68,14 +81,6 @@ resource "kubernetes_deployment" "llama" {
               memory = "4Gi"
               cpu    = "2000m"
             }
-          }
-
-          command = ["python3", "-m", "llama_cpp.server"]
-          args = ["--model", "/models/llama-2-7b-chat.gguf"]
-
-          volume_mount {
-            mount_path = "/models"
-            name       = "model-volume"
           }
         }
 
