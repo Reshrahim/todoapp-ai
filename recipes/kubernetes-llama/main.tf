@@ -13,11 +13,11 @@ variable "context" {
 }
 
 variable "model_url" {
-  default = "https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.q4_k_m.gguf"
+  default = "https://huggingface.co/ggml-org/models/resolve/main/tinyllama-1.1b/ggml-model-f16.gguf"
 }
 
 variable "model_file_name" {
-  default = "tinyllama-1.1b-chat-v1.0.q4_k_m.gguf"
+  default = "ggml-model-f16.gguf"
 }
 
 resource "kubernetes_deployment" "llama" {
