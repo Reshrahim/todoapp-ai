@@ -38,6 +38,23 @@ resource "kubernetes_deployment" "llama" {
       }
 
       spec {
+        init_container {
+          name  = "download-model"
+          image = "curlimages/curl:latest"
+          command = [
+            "sh", "-c",
+            <<-EOT
+              mkdir -p /models && \
+              curl -L -o /models/llama-2-7b-chat.gguf https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.gguf
+            EOT
+          ]
+
+          volume_mount {
+            mount_path = "/models"
+            name       = "model-volume"
+          }
+        }
+
         container {
           name  = "llama"
           image = "ghcr.io/abetlen/llama-cpp-python:latest"
@@ -53,8 +70,7 @@ resource "kubernetes_deployment" "llama" {
             }
           }
 
-          command = ["bash", "-c"]
-          args = ["./main -m /models/llama-2-7b-chat.gguf -p 'Hello from Terraform!'"]
+          args = ["--model", "/models/llama-2-7b-chat.gguf"]
 
           volume_mount {
             mount_path = "/models"
@@ -64,34 +80,10 @@ resource "kubernetes_deployment" "llama" {
 
         volume {
           name = "model-volume"
-
-          host_path {
-            path = "/path/on/host/to/model"
-            type = "Directory"
-          }
+          empty_dir {}
         }
       }
     }
-  }
-}
-
-resource "kubernetes_service" "llama" {
-  metadata {
-    name      = "llama-service"
-    namespace = var.context.runtime.kubernetes.namespace
-  }
-
-  spec {
-    selector = {
-      app = "llama"
-    }
-
-    port {
-      port        = 80
-      target_port = 8080
-    }
-
-    type = "ClusterIP"
   }
 }
 
