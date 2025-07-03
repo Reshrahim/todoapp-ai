@@ -10,7 +10,6 @@ This sample showcases how to deploy a containerized application that connects to
 - Terraform recipes for deploying the application on Azure and AWS
 - TodoList application defined in Bicep
 
-
 ## How to deploy the sample?
 
 ### Pre-requisites
@@ -143,7 +142,7 @@ rad deploy todolist.bicep
 The application can connect to Azure OpenAI's model for natural language processing. The Terraform recipe configures:
 
 - An Azure Cognitive Services account with OpenAI capabilities
-- LLM model deployment with configurable capacity
+- LLM model deployment for task feedback
 
 ### AWS Bedrock
 
