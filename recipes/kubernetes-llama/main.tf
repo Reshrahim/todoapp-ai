@@ -60,16 +60,17 @@ resource "kubernetes_deployment" "llama" {
           image = "ghcr.io/abetlen/llama-cpp-python:latest"
 
           port {
-            container_port = 8080
+            container_port = 8000
           }
 
           resources {
             limits = {
-              memory = "2Gi"
-              cpu    = "1000m"
+              memory = "4Gi"
+              cpu    = "2000m"
             }
           }
 
+          command = ["python3", "-m", "llama_cpp.server"]
           args = ["--model", "/models/llama-2-7b-chat.gguf"]
 
           volume_mount {
@@ -100,7 +101,7 @@ resource "kubernetes_service" "llama" {
 
     port {
       port        = 80
-      target_port = 8080
+      target_port = 8000
     }
 
     type = "ClusterIP"
