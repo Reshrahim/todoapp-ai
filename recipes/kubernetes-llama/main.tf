@@ -87,6 +87,26 @@ resource "kubernetes_deployment" "llama" {
   }
 }
 
+resource "kubernetes_service" "llama" {
+  metadata {
+    name      = "llama-service"
+    namespace = var.context.runtime.kubernetes.namespace
+  }
+
+  spec {
+    selector = {
+      app = "llama"
+    }
+
+    port {
+      port        = 80
+      target_port = 8080
+    }
+
+    type = "ClusterIP"
+  }
+}
+
 
 output "result" {
   value = {
