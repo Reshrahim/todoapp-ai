@@ -78,12 +78,12 @@ resource "kubernetes_deployment" "llama" {
 
           resources {
             requests = {
-              memory = "1Gi"
-              cpu    = "250m"
+              memory = "4Gi"
+              cpu    = "1000m"
             }
             limits = {
-              memory = "2Gi"
-              cpu    = "1000m"
+              memory = "8Gi"
+              cpu    = "4000m"
             }
           }
 
