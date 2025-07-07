@@ -145,7 +145,7 @@ resource "kubernetes_service" "llama" {
 output "result" {
   value = {
     values = {
-        llama_endpoint = "http://${kubernetes_service.llama.metadata[0].name}.${kubernetes_service.llama.metadata[0].namespace}.svc.cluster.local:8080"
+        llama_endpoint = "http://${kubernetes_service.llama.metadata[0].name}.${kubernetes_service.llama.metadata[0].namespace}.svc.cluster.local:80"
     }
   }
 }
