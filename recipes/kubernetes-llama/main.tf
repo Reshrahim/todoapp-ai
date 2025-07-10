@@ -20,6 +20,7 @@ variable "model_file_name" {
   default = "ggml-model-f16.gguf"
 }
 
+
 resource "kubernetes_deployment" "llama" {
   metadata {
     name      = "llama"
@@ -69,7 +70,18 @@ resource "kubernetes_deployment" "llama" {
           }
 
           command = ["/app/llama-server"]
-          args    = ["--model", "/models/${var.model_file_name}", "--host", "0.0.0.0", "--port", "8080"]
+          args    = [
+            "--model", "/models/${var.model_file_name}", 
+            "--host", "0.0.0.0", 
+            "--port", "8080",
+            "--ctx-size", "512",           # Smaller context for speed
+            "--n-predict", "12",           # Match max_tokens from frontend
+            "--threads", "4",              # Optimize thread usage
+            "--batch-size", "512",         # Optimize batch processing
+            "--no-mmap",                   # Disable memory mapping for faster startup
+            "--numa",                      # Enable NUMA optimization
+            "--continuous-batching"        # Enable continuous batching for better throughput
+          ]
 
           volume_mount {
             mount_path = "/models"
@@ -78,12 +90,12 @@ resource "kubernetes_deployment" "llama" {
 
           resources {
             requests = {
-              memory = "4Gi"
-              cpu    = "1000m"
+              memory = "6Gi"              # Increased from 4Gi
+              cpu    = "2000m"            # Increased from 1000m
             }
             limits = {
-              memory = "8Gi"
-              cpu    = "4000m"
+              memory = "12Gi"             # Increased from 8Gi
+              cpu    = "6000m"            # Increased from 4000m
             }
           }
 
@@ -107,6 +119,16 @@ resource "kubernetes_deployment" "llama" {
             period_seconds = 10
             timeout_seconds = 5
             failure_threshold = 3
+          }
+
+          # Add environment variables for optimization
+          env {
+            name  = "LLAMA_CUBLAS"
+            value = "1"
+          }
+          env {
+            name  = "CUDA_VISIBLE_DEVICES"
+            value = "0"
           }
         }
 
