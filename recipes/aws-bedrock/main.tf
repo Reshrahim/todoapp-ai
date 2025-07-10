@@ -15,19 +15,14 @@ variable "context" {
   type = any
 }
 
-variable "model_id" {
-  description = "Bedrock foundation model ID"
-  type        = string
-  default     = "anthropic.claude-3-sonnet-20240229-v1:0"
-}
-
 # Ensure uniqueness
 resource "random_id" "suffix" {
   byte_length = 4
 }
 
 locals {
-  model_arn   = "arn:aws:bedrock:us-west-2::foundation-model/${var.model_id}"
+  # Fixed ARN format - removed double colon, added account ID wildcard
+  model_arn   = "arn:aws:bedrock:us-west-2:*:foundation-model/${var.context.resource.properties.model}"
   user_name   = "bedrock-user-${random_id.suffix.hex}"
   policy_name = "BedrockUserPolicy-${random_id.suffix.hex}"
 }
@@ -44,14 +39,25 @@ resource "aws_iam_policy" "bedrock_policy" {
 
   policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [{
-      Effect   = "Allow",
-      Action   = [
-        "bedrock:InvokeModel",
-        "bedrock:InvokeModelWithResponseStream"
-      ],
-      Resource = local.model_arn
-    }]
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = [
+          "bedrock:InvokeModel",
+          "bedrock:InvokeModelWithResponseStream"
+        ],
+        Resource = local.model_arn
+      },
+      {
+        # Additional permissions for model access discovery
+        Effect   = "Allow",
+        Action   = [
+          "bedrock:ListFoundationModels",
+          "bedrock:GetFoundationModel"
+        ],
+        Resource = "*"
+      }
+    ]
   })
 }
 
@@ -69,7 +75,7 @@ resource "aws_iam_access_key" "bedrock_user_key" {
 output "result" {
   value = {
     values = {
-      model = var.model_id
+      model = var.context.resource.properties.model
       region   = "us-west-2"
       access_key_id     = aws_iam_access_key.bedrock_user_key.id
       secret_access_key = aws_iam_access_key.bedrock_user_key.secret
