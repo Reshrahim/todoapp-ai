@@ -1,4 +1,4 @@
-# Todo Application with AI integration
+# Todo List Application with AI integration
 This sample demonstrates a Todo application that uses AI capabilities to provide feedback on tasks, leveraging Radius for deployment across different cloud providers.
 
 ## Sample Overview
