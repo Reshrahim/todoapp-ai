@@ -1,7 +1,6 @@
 name: Radius.Resources
 types:
   aiModels:
-    capabilities: ["SupportsRecipes"]
     apiVersions:
       '2025-07-14-preview':
         schema: 
