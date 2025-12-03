@@ -32,13 +32,13 @@ resource "azurerm_cognitive_account" "openai" {
   sku_name            = "S0"
 }
 
-resource "azurerm_cognitive_deployment" "gpt35" {
+resource "azurerm_cognitive_deployment" "gpt-5-nano" {
     name = var.context.resource.properties.model
     cognitive_account_id = azurerm_cognitive_account.openai.id
     model {
         format = "OpenAI"
         name = var.context.resource.properties.model
-        version= "0125"
+        version= "2025-08-07"
       }
     rai_policy_name        = "Microsoft.Default"
     version_upgrade_option = "OnceNewDefaultVersionAvailable"  
