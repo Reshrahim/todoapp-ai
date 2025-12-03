@@ -43,7 +43,7 @@ resource "azurerm_cognitive_deployment" "gpt-5-nano" {
     rai_policy_name        = "Microsoft.Default"
     version_upgrade_option = "OnceNewDefaultVersionAvailable"  
     sku {
-      name     = "Standard"
+      name     = "GlobalStandard"
       capacity = "10"
     }
   }
