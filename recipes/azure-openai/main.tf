@@ -51,7 +51,7 @@ resource "azurerm_cognitive_deployment" "gpt-5-nano" {
 output "result" {
   value = {
     values = {
-      apiVersion = "2023-05-15"
+      apiVersion = "2024-10-21"
       endpoint   = azurerm_cognitive_account.openai.endpoint
       model = var.context.resource.properties.model
     }
