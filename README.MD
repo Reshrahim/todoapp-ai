@@ -16,7 +16,7 @@ This sample showcases how to deploy a containerized application that connects to
 ### Pre-requisites
 
 - A Kubernetes cluster to host Radius control plane and the Todo List application
-- [Edge version of Radius CLI](https://edge.docs.radapp.io/getting-started/install/)
+- [Edge version of Radius CLI](https://docs.radapp.io/tutorials/install-radius/)
 - [Radius installed on your Kubernetes cluster](https://docs.radapp.io/guides/operations/kubernetes/install/)
 - [Azure and AWS cloud providers configured in Radius](https://docs.radapp.io/guides/operations/providers/overview/)
 

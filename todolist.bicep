@@ -37,6 +37,6 @@ resource ai 'Radius.Resources/aiModels@2025-07-14-preview' = {
   properties: {
     application: todolist.id
     environment: environment
-    model:'<model-id>'
+    model:'tinyllama'
   }
 }

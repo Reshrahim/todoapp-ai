@@ -63,7 +63,7 @@ resource "kubernetes_deployment" "llama" {
 
         container {
           name  = "llama"
-          image = "ghcr.io/ggerganov/llama.cpp:server"
+          image = "ghcr.io/ggml-org/llama.cpp:server"
 
           port {
             container_port = 8080
